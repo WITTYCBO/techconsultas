@@ -1,5 +1,5 @@
 // TechConsultas Service Worker v1.0
-const CACHE_NAME = 'techconsultas-v1';
+const CACHE_NAME = 'techconsultas-v3';
 const ASSETS = [
   '/',
   '/index.html',
