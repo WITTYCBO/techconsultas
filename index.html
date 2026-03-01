@@ -1267,33 +1267,39 @@ async function submitConsulta(event) {
   btn.classList.add('loading');
   
   try {
+    // Construir mensaje WhatsApp directamente en el cliente (sin depender del servidor)
+    const prioEmoji = { alta: '🔴', media: '🟡', baja: '🟢' };
+    const emoji = prioEmoji[consulta.prioridad] || '⚪';
+    const mensaje =
+      `${emoji} *NUEVA CONSULTA TÉCNICA* ${emoji}\n\n` +
+      `👤 *Empleado:* ${consulta.nombre}\n` +
+      `🏢 *Sala:* ${consulta.sala}\n` +
+      `🔧 *Tipo:* ${consulta.tipo}\n` +
+      `⚡ *Prioridad:* ${consulta.prioridad.toUpperCase()}\n\n` +
+      `📝 *Descripción:*\n${consulta.descripcion}\n\n` +
+      `🆔 ID: ${consulta.id}\n` +
+      `⏰ ${new Date().toLocaleString('es-ES')}`;
+
+    // Abrir WhatsApp inmediatamente (no depende del servidor)
+    window.open(`https://wa.me/34646365886?text=${encodeURIComponent(mensaje)}`, '_blank');
+
     if (!CONFIG.DEMO_MODE) {
-      // Enviar a Google Apps Script
-      const payload = { ...consulta, fotos: photos.length > 0 ? `${photos.length} foto(s) adjunta(s)` : 'Sin fotos' };
-      const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'nueva', consulta: payload })
+      // Enviar al Sheet via GET con parámetros en URL (evita problemas CORS)
+      const params = new URLSearchParams({
+        action: 'nueva',
+        id: consulta.id,
+        nombre: consulta.nombre,
+        sala: consulta.sala,
+        tipo: consulta.tipo,
+        prioridad: consulta.prioridad,
+        descripcion: consulta.descripcion,
+        fechaCreacion: consulta.fechaCreacion,
+        fotos: photos.length > 0 ? `${photos.length} foto(s) adjunta(s)` : 'Sin fotos'
       });
-      const result = await response.json();
-      // Abrir WhatsApp con el mensaje ya formateado (método wa.me)
-      if (result.waUrl) {
-        window.open(result.waUrl, '_blank');
-      }
-    } else {
-      // DEMO: abrir WhatsApp directamente desde el cliente
-      const prioEmoji = { alta: '🔴', media: '🟡', baja: '🟢' };
-      const emoji = prioEmoji[consulta.prioridad] || '⚪';
-      const mensaje =
-        `${emoji} *NUEVA CONSULTA TÉCNICA* ${emoji}\n\n` +
-        `👤 *Empleado:* ${consulta.nombre}\n` +
-        `🏢 *Sala:* ${consulta.sala}\n` +
-        `🔧 *Tipo:* ${consulta.tipo}\n` +
-        `⚡ *Prioridad:* ${consulta.prioridad.toUpperCase()}\n\n` +
-        `📝 *Descripción:*\n${consulta.descripcion}\n\n` +
-        `🆔 ID: ${consulta.id}\n` +
-        `⏰ ${new Date().toLocaleString('es-ES')}`;
-      window.open(`https://wa.me/34646365886?text=${encodeURIComponent(mensaje)}`, '_blank');
+      fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`)
+        .then(r => r.json())
+        .then(result => console.log('Sheet OK:', result))
+        .catch(err => console.warn('Sheet error (no crítico):', err));
     }
     
     // Guardar localmente
