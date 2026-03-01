@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0e1a">
+<!-- PWA iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TechConsultas">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72"   href="icon-72.png">
+<link rel="apple-touch-icon" sizes="96x96"   href="icon-96.png">
+<link rel="apple-touch-icon" sizes="128x128" href="icon-128.png">
+<link rel="apple-touch-icon" sizes="144x144" href="icon-144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<!-- PWA Android / General -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<!-- iOS Splash Screen color -->
+<meta name="msapplication-TileColor" content="#080c18">
+<meta name="msapplication-TileImage" content="icon-144.png">
+<title>TechConsultas — Soporte Técnico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c18;
+    --bg2: #0d1225;
+    --bg3: #111827;
+    --panel: #141b2d;
+    --border: #1e2a45;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #7fff6b;
+    --text: #e8edf5;
+    --text2: #7a8ba8;
+    --text3: #4a5568;
+    --warning: #ffc107;
+    --danger: #ff4444;
+    --success: #00e676;
+    --font-mono: 'Space Mono', monospace;
+    --font-display: 'Bebas Neue', cursive;
+    --font-body: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  /* === SCANLINES EFFECT === */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,212,255,0.015) 2px,
+      rgba(0,212,255,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* === HEADER === */
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(8,12,24,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-logo {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
+    50% { box-shadow: 0 0 20px 5px rgba(0,212,255,0.2); }
+  }
+
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  .logo-text span {
+    color: var(--text2);
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* === MAIN LAYOUT === */
+  .app {
+    padding-top: 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* === NAV TABS === */
+  .nav-tabs {
+    display: flex;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .nav-tab {
+    flex: 1;
+    min-width: 120px;
+    padding: 14px 10px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--text3);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .nav-tab:hover { color: var(--text2); }
+  .nav-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* === VIEWS === */
+  .view { display: none; flex: 1; }
+  .view.active { display: flex; flex-direction: column; }
+
+  /* === NUEVA CONSULTA VIEW === */
+  .form-container {
+    padding: 24px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .section-header {
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .section-subtitle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 4px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text2);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .form-label .required {
+    color: var(--accent2);
+    margin-left: 4px;
+  }
+
+  .form-control {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    appearance: none;
+  }
+
+  .form-control:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+  }
+
+  .form-control::placeholder { color: var(--text3); }
+
+  select.form-control {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8ba8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+  }
+
+  /* === PRIORITY SELECTOR === */
+  .priority-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .priority-btn {
+    padding: 12px 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .priority-btn:hover { border-color: var(--text2); }
+
+  .priority-btn.selected[data-priority="baja"] {
+    background: rgba(0,230,118,0.1);
+    border-color: var(--success);
+    color: var(--success);
+  }
+  .priority-btn.selected[data-priority="media"] {
+    background: rgba(255,193,7,0.1);
+    border-color: var(--warning);
+    color: var(--warning);
+  }
+  .priority-btn.selected[data-priority="alta"] {
+    background: rgba(255,68,68,0.1);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .priority-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+
+  /* === PHOTO UPLOAD === */
+  .photo-area {
+    border: 2px dashed var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .photo-area:hover {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.03);
+  }
+
+  .photo-area input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .photo-icon { font-size: 32px; margin-bottom: 8px; }
+  .photo-text { font-size: 13px; color: var(--text2); }
+  .photo-hint { font-family: var(--font-mono); font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+  .photo-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .photo-thumb {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+
+  .photo-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-thumb .remove-photo {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255,68,68,0.8);
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  /* === SUBMIT BUTTON === */
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 4px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-submit:hover {
+    background: #33ddff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,212,255,0.3);
+  }
+
+  .btn-submit:active { transform: translateY(0); }
+
+  .btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-submit .btn-loader {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-submit.loading .btn-loader { display: flex; }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(8,12,24,0.3);
+    border-top-color: var(--bg);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* === CONSULTAS LIST === */
+  .list-container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .filter-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .filter-chip.active {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .consulta-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: slide-in 0.3s ease;
+  }
+
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .consulta-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .consulta-card.has-feedback {
+    border-left: 3px solid var(--success);
+  }
+
+  .consulta-card.pending {
+    border-left: 3px solid var(--warning);
+  }
+
+  .card-header {
+    padding: 14px 16px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .badge-sala { background: rgba(0,212,255,0.1); color: var(--accent); }
+  .badge-prioridad-alta { background: rgba(255,68,68,0.1); color: var(--danger); }
+  .badge-prioridad-media { background: rgba(255,193,7,0.1); color: var(--warning); }
+  .badge-prioridad-baja { background: rgba(0,230,118,0.1); color: var(--success); }
+  .badge-feedback { background: rgba(0,230,118,0.15); color: var(--success); }
+  .badge-pending { background: rgba(255,193,7,0.1); color: var(--warning); }
+
+  .card-time {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  .card-body { padding: 0 16px 14px; }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .card-description {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .feedback-preview {
+    font-size: 12px;
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .feedback-preview-text {
+    color: var(--text2);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* === MODAL === */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 500;
+    padding: 20px;
+    overflow-y: auto;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.active { display: flex; align-items: flex-start; justify-content: center; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 100%;
+    max-width: 560px;
+    margin: auto;
+    animation: modal-in 0.25s ease;
+  }
+
+  @keyframes modal-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    background: var(--border);
+    border: none;
+    border-radius: 4px;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .modal-close:hover { background: var(--danger); color: white; }
+
+  .modal-body { padding: 20px; }
+
+  .detail-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .detail-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text3);
+    text-transform: uppercase;
+    min-width: 80px;
+    padding-top: 2px;
+  }
+
+  .detail-value {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  .feedback-box {
+    background: rgba(0,230,118,0.05);
+    border: 1px solid rgba(0,230,118,0.2);
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .feedback-box-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--success);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .feedback-box-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  .no-feedback-box {
+    background: rgba(255,193,7,0.05);
+    border: 1px solid rgba(255,193,7,0.15);
+    border-radius: 6px;
+    padding: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  /* === EMPTY STATE === */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text3);
+  }
+
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+  .empty-text { font-family: var(--font-mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* === TOAST === */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--text);
+    white-space: nowrap;
+    animation: toast-in 0.3s ease, toast-out 0.3s ease 2.7s forwards;
+    max-width: 90vw;
+    text-align: center;
+  }
+
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes toast-out {
+    to { opacity: 0; transform: translateY(-10px); }
+  }
+
+  /* === STATS BAR === */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-item {
+    background: var(--bg2);
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* === PROFILE VIEW === */
+  .profile-container {
+    padding: 24px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .user-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: var(--bg);
+  }
+
+  .user-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .user-role { font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: 2px; }
+
+  .config-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .config-section-title {
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text3);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+
+  .config-item {
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .config-item:last-child { border-bottom: none; }
+  .config-item:hover { background: rgba(255,255,255,0.03); }
+
+  .config-item-label { font-size: 14px; color: var(--text); }
+  .config-item-value { font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+
+  /* IMAGE PREVIEW in modal */
+  .modal-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .modal-img {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .modal-img img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* === RESPONSIVE === */
+  @media (min-width: 768px) {
+    .form-container, .list-container, .profile-container {
+      padding: 32px 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo">
+    <div class="logo-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" fill="#080c18"/>
+      </svg>
+    </div>
+    <span class="logo-text">TECH<span>CONSULTAS</span></span>
+  </div>
+  <div class="header-status">
+    <div class="status-dot"></div>
+    <span id="headerUser">Sistema activo</span>
+  </div>
+</header>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- STATS BAR -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-item">
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="statPending" style="color: var(--warning)">0</div>
+      <div class="stat-label">Pendientes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="statSolved" style="color: var(--success)">0</div>
+      <div class="stat-label">Resueltas</div>
+    </div>
+  </div>
+
+  <!-- NAV TABS -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('nueva')">⊕ Nueva consulta</button>
+    <button class="nav-tab" onclick="switchView('mis')">▦ Mis consultas</button>
+    <button class="nav-tab" onclick="switchView('perfil')">◈ Perfil</button>
+  </nav>
+
+  <!-- VIEW: NUEVA CONSULTA -->
+  <div class="view active" id="view-nueva">
+    <div class="form-container">
+      <div class="section-header">
+        <h1 class="section-title">NUEVA CONSULTA</h1>
+        <p class="section-subtitle">Envía tu consulta técnica al equipo de soporte</p>
+      </div>
+
+      <form id="consultaForm" onsubmit="submitConsulta(event)">
+
+        <div class="form-group">
+          <label class="form-label">Nombre <span class="required">*</span></label>
+          <input type="text" class="form-control" id="nombre" placeholder="Tu nombre completo" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Sala / Departamento <span class="required">*</span></label>
+          <input type="text" class="form-control" id="sala" list="salaOptions"
+            placeholder="Escribe o selecciona la sala..." required autocomplete="off">
+          <datalist id="salaOptions">
+            <option value="Sala A">
+            <option value="Sala B">
+            <option value="Sala C">
+            <option value="Sala D">
+            <option value="Sala E">
+            <option value="Recepción">
+            <option value="Oficina técnica">
+            <option value="Almacén">
+            <option value="Dirección">
+          </datalist>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tipo de consulta <span class="required">*</span></label>
+          <select class="form-control" id="tipo" required>
+            <option value="">— Seleccionar tipo —</option>
+            <option value="Hardware">Hardware</option>
+            <option value="Software">Software</option>
+            <option value="Red / Conectividad">Red / Conectividad</option>
+            <option value="Impresora / Escáner">Impresora / Escáner</option>
+            <option value="Teléfono / Comunicaciones">Teléfono / Comunicaciones</option>
+            <option value="Instalación equipo">Instalación equipo</option>
+            <option value="Mantenimiento preventivo">Mantenimiento preventivo</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Prioridad <span class="required">*</span></label>
+          <div class="priority-grid">
+            <div class="priority-btn" data-priority="baja" onclick="selectPriority(this)">
+              <span class="priority-icon">🟢</span> BAJA
+            </div>
+            <div class="priority-btn" data-priority="media" onclick="selectPriority(this)">
+              <span class="priority-icon">🟡</span> MEDIA
+            </div>
+            <div class="priority-btn" data-priority="alta" onclick="selectPriority(this)">
+              <span class="priority-icon">🔴</span> ALTA
+            </div>
+          </div>
+          <input type="hidden" id="prioridad" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descripción del problema <span class="required">*</span></label>
+          <textarea class="form-control" id="descripcion" placeholder="Describe el problema con el mayor detalle posible: qué pasó, desde cuándo, qué has probado..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fotos del problema (opcional)</label>
+          <div class="photo-area" id="photoArea">
+            <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)">
+            <div class="photo-icon">📷</div>
+            <div class="photo-text">Toca para añadir fotos</div>
+            <div class="photo-hint">JPG, PNG — Máx. 3 imágenes</div>
+          </div>
+          <div class="photo-preview" id="photoPreview"></div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnSubmit">
+          ENVIAR CONSULTA
+          <div class="btn-loader">
+            <div class="spinner"></div>
+          </div>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- VIEW: MIS CONSULTAS -->
+  <div class="view" id="view-mis">
+    <div class="list-container">
+      <div class="section-header">
+        <h1 class="section-title">MIS CONSULTAS</h1>
+        <p class="section-subtitle">Historial y respuestas de soporte</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-chip active" onclick="filterConsultas('todas', this)">Todas</div>
+        <div class="filter-chip" onclick="filterConsultas('pendiente', this)">Pendientes</div>
+        <div class="filter-chip" onclick="filterConsultas('resuelto', this)">Resueltas</div>
+        <div class="filter-chip" onclick="filterConsultas('alta', this)">Alta prioridad</div>
+      </div>
+
+      <div id="consultasList"></div>
+    </div>
+  </div>
+
+  <!-- VIEW: PERFIL -->
+  <div class="view" id="view-perfil">
+    <div class="profile-container">
+      <div class="section-header">
+        <h1 class="section-title">PERFIL</h1>
+        <p class="section-subtitle">Configuración de usuario</p>
+      </div>
+
+      <div class="user-card">
+        <div class="avatar" id="avatarInitials">?</div>
+        <div class="user-name" id="profileName">Sin configurar</div>
+        <div class="user-role" id="profileSala">— Sala no definida —</div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-section-title">Datos personales</div>
+        <div class="config-item" onclick="editField('nombre', 'Tu nombre')">
+          <span class="config-item-label">Nombre</span>
+          <span class="config-item-value" id="cfgNombre">—</span>
+        </div>
+        <div class="config-item" onclick="editSala()">
+          <span class="config-item-label">Sala habitual</span>
+          <span class="config-item-value" id="cfgSala">—</span>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-section-title">Información del sistema</div>
+        <div class="config-item">
+          <span class="config-item-label">App version</span>
+          <span class="config-item-value">v1.0.0</span>
+        </div>
+        <div class="config-item">
+          <span class="config-item-label">Soporte WhatsApp</span>
+          <span class="config-item-value">+34 646 365 886</span>
+        </div>
+        <div class="config-item" onclick="clearData()">
+          <span class="config-item-label" style="color: var(--danger)">Limpiar datos locales</span>
+          <span class="config-item-value">›</span>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-section-title">PWA</div>
+        <div class="config-item" id="installItem" style="display:none" onclick="installPWA()">
+          <span class="config-item-label">Instalar en pantalla de inicio</span>
+          <span class="config-item-value">Instalar ›</span>
+        </div>
+        <div class="config-item" onclick="syncConsultas()">
+          <span class="config-item-label">Sincronizar consultas</span>
+          <span class="config-item-value">Sync ›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">DETALLE</div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ============================================================
+// CONFIGURACIÓN — Modifica estas URLs con tu Apps Script
+// ============================================================
+const CONFIG = {
+  // URL del Web App de Google Apps Script (desplegado como web app)
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxWQ3QGijs6EKvKrcR3yX-5JLDHPe7PMpyY65yI2QVG4qiNrX0_A1D7frWqS5W9-yMg/exec',
+  
+  // Para usar en modo demo (sin backend real), cambia a true
+  DEMO_MODE: false
+};
+
+// ============================================================
+// ESTADO DE LA APP
+// ============================================================
+let consultas = JSON.parse(localStorage.getItem('consultas') || '[]');
+let selectedPriority = '';
+let photos = [];
+let deferredPrompt = null;
+let currentFilter = 'todas';
+
+// ============================================================
+// INICIALIZACIÓN
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  loadProfile();
+  renderConsultas();
+  updateStats();
+  
+  // Prefill nombre y sala si hay datos guardados
+  const savedNombre = localStorage.getItem('userNombre');
+  const savedSala = localStorage.getItem('userSala');
+  if (savedNombre) document.getElementById('nombre').value = savedNombre;
+  if (savedSala) document.getElementById('sala').value = savedSala;
+});
+
+// PWA Install
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installItem').style.display = 'flex';
+});
+
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('installItem').style.display = 'none';
+    });
+  }
+}
+
+// ============================================================
+// NAVEGACIÓN
+// ============================================================
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.nav-tab')[['nueva','mis','perfil'].indexOf(name)].classList.add('active');
+  
+  if (name === 'mis') {
+    syncConsultas();
+  }
+}
+
+// ============================================================
+// PRIORIDAD
+// ============================================================
+function selectPriority(el) {
+  document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPriority = el.dataset.priority;
+  document.getElementById('prioridad').value = selectedPriority;
+}
+
+// ============================================================
+// FOTOS
+// ============================================================
+function handlePhotos(event) {
+  const files = Array.from(event.target.files);
+  const remaining = 3 - photos.length;
+  const toAdd = files.slice(0, remaining);
+  
+  toAdd.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      photos.push({ name: file.name, data: e.target.result });
+      renderPhotoPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  if (files.length > remaining) {
+    showToast(`Máximo 3 fotos. Se añadieron ${toAdd.length}.`, 'error');
+  }
+}
+
+function renderPhotoPreview() {
+  const preview = document.getElementById('photoPreview');
+  preview.innerHTML = photos.map((p, i) => `
+    <div class="photo-thumb">
+      <img src="${p.data}" alt="Foto ${i+1}">
+      <button class="remove-photo" onclick="removePhoto(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+function removePhoto(index) {
+  photos.splice(index, 1);
+  renderPhotoPreview();
+}
+
+// ============================================================
+// ENVIAR CONSULTA
+// ============================================================
+async function submitConsulta(event) {
+  event.preventDefault();
+  
+  const nombre = document.getElementById('nombre').value.trim();
+  const sala = document.getElementById('sala').value;
+  const tipo = document.getElementById('tipo').value;
+  const prioridad = document.getElementById('prioridad').value;
+  const descripcion = document.getElementById('descripcion').value.trim();
+  
+  if (!prioridad) {
+    showToast('Selecciona una prioridad', 'error');
+    return;
+  }
+  
+  // Guardar datos de usuario
+  localStorage.setItem('userNombre', nombre);
+  localStorage.setItem('userSala', sala);
+  loadProfile();
+  
+  const consulta = {
+    id: Date.now().toString(),
+    nombre,
+    sala,
+    tipo,
+    prioridad,
+    descripcion,
+    fotos: photos.map(p => p.data),
+    fechaCreacion: new Date().toISOString(),
+    estado: 'pendiente',
+    feedback: null
+  };
+  
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  
+  try {
+    if (!CONFIG.DEMO_MODE) {
+      // Enviar a Google Apps Script
+      const payload = { ...consulta, fotos: photos.length > 0 ? `${photos.length} foto(s) adjunta(s)` : 'Sin fotos' };
+      const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'nueva', consulta: payload })
+      });
+      const result = await response.json();
+      // Abrir WhatsApp con el mensaje ya formateado (método wa.me)
+      if (result.waUrl) {
+        window.open(result.waUrl, '_blank');
+      }
+    } else {
+      // DEMO: abrir WhatsApp directamente desde el cliente
+      const prioEmoji = { alta: '🔴', media: '🟡', baja: '🟢' };
+      const emoji = prioEmoji[consulta.prioridad] || '⚪';
+      const mensaje =
+        `${emoji} *NUEVA CONSULTA TÉCNICA* ${emoji}\n\n` +
+        `👤 *Empleado:* ${consulta.nombre}\n` +
+        `🏢 *Sala:* ${consulta.sala}\n` +
+        `🔧 *Tipo:* ${consulta.tipo}\n` +
+        `⚡ *Prioridad:* ${consulta.prioridad.toUpperCase()}\n\n` +
+        `📝 *Descripción:*\n${consulta.descripcion}\n\n` +
+        `🆔 ID: ${consulta.id}\n` +
+        `⏰ ${new Date().toLocaleString('es-ES')}`;
+      window.open(`https://wa.me/34646365886?text=${encodeURIComponent(mensaje)}`, '_blank');
+    }
+    
+    // Guardar localmente
+    consultas.unshift(consulta);
+    saveConsultas();
+    updateStats();
+    
+    // Reset form
+    document.getElementById('consultaForm').reset();
+    photos = [];
+    document.getElementById('photoPreview').innerHTML = '';
+    document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('selected'));
+    selectedPriority = '';
+    
+    showToast('✓ Consulta enviada correctamente', 'success');
+    
+    // Ir a mis consultas
+    setTimeout(() => switchView('mis'), 1200);
+    
+  } catch (error) {
+    console.error(error);
+    // Guardar igualmente de forma local
+    consultas.unshift(consulta);
+    saveConsultas();
+    updateStats();
+    showToast('Guardado local. Verifica conexión.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+// ============================================================
+// SINCRONIZAR (obtener feedback del servidor)
+// ============================================================
+async function syncConsultas() {
+  if (CONFIG.DEMO_MODE) {
+    renderConsultas();
+    return;
+  }
+  
+  try {
+    const ids = consultas.map(c => c.id).join(',');
+    const url = `${CONFIG.APPS_SCRIPT_URL}?action=getFeedback&ids=${ids}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data.feedback) {
+      data.feedback.forEach(fb => {
+        const c = consultas.find(x => x.id === fb.id);
+        if (c && fb.feedback) {
+          c.feedback = fb.feedback;
+          c.estado = 'resuelto';
+        }
+      });
+      saveConsultas();
+    }
+  } catch (e) {
+    console.log('Sin conexión, mostrando datos locales');
+  }
+  
+  renderConsultas();
+  updateStats();
+}
+
+// ============================================================
+// RENDER LISTA
+// ============================================================
+function filterConsultas(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderConsultas();
+}
+
+function renderConsultas() {
+  const list = document.getElementById('consultasList');
+  
+  let filtered = consultas;
+  if (currentFilter === 'pendiente') filtered = consultas.filter(c => c.estado === 'pendiente' || !c.feedback);
+  if (currentFilter === 'resuelto') filtered = consultas.filter(c => c.feedback);
+  if (currentFilter === 'alta') filtered = consultas.filter(c => c.prioridad === 'alta');
+  
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-text">${currentFilter === 'todas' ? 'No hay consultas aún' : 'Sin resultados para este filtro'}</div>
+      </div>
+    `;
+    return;
+  }
+  
+  list.innerHTML = filtered.map(c => {
+    const date = new Date(c.fechaCreacion);
+    const timeStr = date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) + 
+                    ' ' + date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    
+    return `
+    <div class="consulta-card ${c.feedback ? 'has-feedback' : 'pending'}" onclick="openModal('${c.id}')">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="badge badge-sala">${c.sala}</span>
+          <span class="badge badge-prioridad-${c.prioridad}">${c.prioridad.toUpperCase()}</span>
+          ${c.feedback ? '<span class="badge badge-feedback">✓ RESUELTO</span>' : '<span class="badge badge-pending">PENDIENTE</span>'}
+        </div>
+        <span class="card-time">${timeStr}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${c.tipo}</div>
+        <div class="card-description">${c.descripcion}</div>
+      </div>
+      ${c.feedback ? `
+      <div class="card-footer">
+        <div class="feedback-preview">✓</div>
+        <div class="feedback-preview-text">${c.feedback.substring(0, 80)}${c.feedback.length > 80 ? '...' : ''}</div>
+      </div>` : ''}
+    </div>
+  `}).join('');
+}
+
+// ============================================================
+// MODAL DETALLE
+// ============================================================
+function openModal(id) {
+  const c = consultas.find(x => x.id === id);
+  if (!c) return;
+  
+  const date = new Date(c.fechaCreacion);
+  const dateStr = date.toLocaleString('es-ES');
+  
+  document.getElementById('modalTitle').textContent = c.tipo.toUpperCase();
+  
+  document.getElementById('modalBody').innerHTML = `
+    <div class="detail-row">
+      <span class="detail-label">Solicitante</span>
+      <span class="detail-value">${c.nombre}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Sala</span>
+      <span class="detail-value">${c.sala}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Prioridad</span>
+      <span class="detail-value">
+        <span class="badge badge-prioridad-${c.prioridad}">${c.prioridad.toUpperCase()}</span>
+      </span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Fecha</span>
+      <span class="detail-value" style="font-family:var(--font-mono);font-size:12px;">${dateStr}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Descripción</span>
+      <span class="detail-value">${c.descripcion}</span>
+    </div>
+    ${c.fotos && c.fotos.length > 0 ? `
+    <div class="detail-row">
+      <span class="detail-label">Fotos</span>
+      <div style="flex:1">
+        <div class="modal-images">
+          ${c.fotos.map(f => `<div class="modal-img"><img src="${f}" alt="foto"></div>`).join('')}
+        </div>
+      </div>
+    </div>` : ''}
+    
+    <div class="divider"></div>
+    
+    ${c.feedback ? `
+    <div class="feedback-box">
+      <div class="feedback-box-label">✓ SOLUCIÓN DEL TÉCNICO</div>
+      <div class="feedback-box-text">${c.feedback}</div>
+    </div>` : `
+    <div class="no-feedback-box">
+      ⏳ Tu consulta está siendo revisada.<br>
+      Recibirás la solución aquí cuando esté disponible.
+    </div>`}
+  `;
+  
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+  const total = consultas.length;
+  const solved = consultas.filter(c => c.feedback).length;
+  const pending = total - solved;
+  
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statSolved').textContent = solved;
+}
+
+// ============================================================
+// PERFIL
+// ============================================================
+function loadProfile() {
+  const nombre = localStorage.getItem('userNombre') || 'Sin configurar';
+  const sala = localStorage.getItem('userSala') || '—';
+  
+  document.getElementById('profileName').textContent = nombre;
+  document.getElementById('profileSala').textContent = sala;
+  document.getElementById('cfgNombre').textContent = nombre;
+  document.getElementById('cfgSala').textContent = sala;
+  document.getElementById('headerUser').textContent = nombre !== 'Sin configurar' ? nombre : 'Sistema activo';
+  
+  const initials = nombre.split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 2);
+  document.getElementById('avatarInitials').textContent = initials || '?';
+}
+
+function editField(field, placeholder) {
+  const current = localStorage.getItem('user' + field.charAt(0).toUpperCase() + field.slice(1)) || '';
+  const value = prompt(`${placeholder}:`, current);
+  if (value !== null && value.trim()) {
+    localStorage.setItem('user' + field.charAt(0).toUpperCase() + field.slice(1), value.trim());
+    loadProfile();
+    document.getElementById('nombre').value = value.trim();
+  }
+}
+
+function editSala() {
+  const current = localStorage.getItem('userSala') || '';
+  const value = prompt('Sala / Departamento habitual (escribe libremente):', current);
+  if (value !== null && value.trim()) {
+    localStorage.setItem('userSala', value.trim());
+    loadProfile();
+    document.getElementById('sala').value = value.trim();
+  }
+}
+
+function clearData() {
+  if (confirm('¿Eliminar todos los datos locales? Esto no afecta al servidor.')) {
+    localStorage.clear();
+    consultas = [];
+    saveConsultas();
+    loadProfile();
+    renderConsultas();
+    updateStats();
+    showToast('Datos locales eliminados', 'success');
+  }
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(console.error);
+}
+
+function saveConsultas() {
+  localStorage.setItem('consultas', JSON.stringify(consultas));
+}
+
+function showToast(message, type = '') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
+}
+</script>
+
+</body>
+</html>
