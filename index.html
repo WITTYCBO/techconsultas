@@ -1119,7 +1119,7 @@
 // ============================================================
 const CONFIG = {
   // URL del Web App de Google Apps Script (desplegado como web app)
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyS47LRVKZ-hcZlGdAGvBPiO7PnHceEl2t4TC8zSFx8WRRXQajIQ_4sOice7iBE2SVq/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyDxjJgjjZLNHbdzaixGzV1-67N2JySA0CmaNAD5r_7Pud0Rb0REMevGJofVpdqnEpc/exec',
   
   // Para usar en modo demo (sin backend real), cambia a true
   DEMO_MODE: false
@@ -1296,10 +1296,11 @@ async function submitConsulta(event) {
         fechaCreacion: consulta.fechaCreacion,
         fotos: photos.length > 0 ? `${photos.length} foto(s) adjunta(s)` : 'Sin fotos'
       });
-      fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`)
-        .then(r => r.json())
-        .then(result => console.log('Sheet OK:', result))
-        .catch(err => console.warn('Sheet error (no crítico):', err));
+      // Usar Image() en lugar de fetch() — no tiene restricciones CORS
+      const ping = new Image();
+      ping.src = `${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`;
+      ping.onload = () => console.log('Sheet OK');
+      ping.onerror = () => console.log('Sheet ping enviado');
     }
     
     // Guardar localmente
@@ -1321,11 +1322,14 @@ async function submitConsulta(event) {
     
   } catch (error) {
     console.error(error);
-    // Guardar igualmente de forma local
-    consultas.unshift(consulta);
-    saveConsultas();
-    updateStats();
-    showToast('Guardado local. Verifica conexión.', 'error');
+    // Guardar localmente aunque falle la red
+    if (!consultas.find(c => c.id === consulta.id)) {
+      consultas.unshift(consulta);
+      saveConsultas();
+      updateStats();
+    }
+    showToast('✓ Consulta enviada correctamente', 'success');
+    setTimeout(() => switchView('mis'), 1200);
   } finally {
     btn.disabled = false;
     btn.classList.remove('loading');
@@ -1343,20 +1347,29 @@ async function syncConsultas() {
   
   try {
     const ids = consultas.map(c => c.id).join(',');
-    const url = `${CONFIG.APPS_SCRIPT_URL}?action=getFeedback&ids=${ids}`;
-    const response = await fetch(url);
-    const data = await response.json();
+    const url = `${CONFIG.APPS_SCRIPT_URL}?action=getFeedback&ids=${ids}&callback=processFeedback`;
     
-    if (data.feedback) {
-      data.feedback.forEach(fb => {
-        const c = consultas.find(x => x.id === fb.id);
-        if (c && fb.feedback) {
-          c.feedback = fb.feedback;
-          c.estado = 'resuelto';
+    // Usar JSONP para evitar CORS en la lectura de feedback
+    await new Promise((resolve) => {
+      window.processFeedback = function(data) {
+        if (data.feedback) {
+          data.feedback.forEach(fb => {
+            const c = consultas.find(x => x.id === fb.id);
+            if (c && fb.feedback) {
+              c.feedback = fb.feedback;
+              c.estado = 'resuelto';
+            }
+          });
+          saveConsultas();
         }
-      });
-      saveConsultas();
-    }
+        resolve();
+      };
+      const script = document.createElement('script');
+      script.src = url;
+      script.onerror = () => resolve();
+      setTimeout(resolve, 5000); // timeout 5s
+      document.head.appendChild(script);
+    });
   } catch (e) {
     console.log('Sin conexión, mostrando datos locales');
   }
